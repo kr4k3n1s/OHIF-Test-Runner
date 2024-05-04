@@ -1,0 +1,21 @@
+{
+    "name": "Lung anatomy test 1",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi vestibulum est in molestie egestas. Aenean accumsan turpis vehicula, bibendum ex vel, sagittis dui. Sed augue felis, tempus id accumsan at, dignissim id arcu. Integer dapibus viverra dui, nec vulputate ex blandit eget. Etiam id mauris lectus.",
+    "questions": [
+        { 
+            "id": "quest1",
+            "question": "This is question 1.",
+            "answers": [ "Ans 1.1", "Ans 1.2", "Ans 1.3"],
+            "correctAnswers": ["Ans 1.1", "Ans 1.2"],
+            "url": "https://viewer.ohif.org/viewer?StudyInstanceUIDs=1.3.6.1.4.1.14519.5.2.1.7009.2403.334240657131972136850343327463"
+        },
+        { 
+            "id": "quest2",
+            "question": "This is question 2.",
+            "answers": [ "Ans 2.1", "Ans 2.2", "Ans 2.3"],
+            "correctAnswers": ["Ans 2.1"],
+            "url": "https://viewer.ohif.org/viewer?StudyInstanceUIDs=1.3.6.1.4.1.14519.5.2.1.7695.4007.324475281161490036195179843543"
+        }
+    ],
+    "passing": 1
+}
