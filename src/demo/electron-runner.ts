@@ -1,8 +1,9 @@
-import { app, BrowserWindow, globalShortcut, ipcMain, shell} from 'electron'
+import { app, BrowserWindow, dialog, globalShortcut, ipcMain, shell} from 'electron'
 import { OverlayController, OVERLAY_WINDOW_OPTS } from '..'
 import { Test } from '../models/Test';
-import * as test1 from '../tests/test1.json';
 import { TestRunner } from './test-framework';
+const path = require('path');
+const fs = require('fs');
 
 // https://github.com/electron/electron/issues/25153
 app.disableHardwareAcceleration()
@@ -16,6 +17,33 @@ const toggleShowKey = 'CmdOrCtrl + K'
 app.on('ready', () => {
   startLanding();
 })
+
+ipcMain.on('save-file', (event, data) => {
+  const options = {
+    title: 'Save JSON File',
+    buttonLabel: 'Save',
+    filters: [
+      { name: 'JSON', extensions: ['json'] },
+      { name: 'All Files', extensions: ['*'] }
+    ]
+  };
+
+  dialog.showSaveDialog(options).then(result => {
+    if (!result.canceled) {
+      const filePath = result.filePath;
+      const jsonData = JSON.stringify(data, null, 2);
+      fs.writeFile(filePath, jsonData, (err: any) => {
+        if (err) {
+          console.log('Error saving file:', err);
+        } else {
+          console.log('File saved successfully:', filePath);
+        }
+      });
+    }
+  }).catch(err => {
+    console.log(err);
+  });
+});
 
 function startLanding() {
   landingWindow = new BrowserWindow({
@@ -92,6 +120,7 @@ function toggleOverlayState (isInteractable: boolean) {
 function appCommandRouter(event: Electron.IpcMainEvent, data: any) {
   console.log('Data received: ' + JSON.stringify(data));
   if(data.func == 'startTest') startTest(data.data as Test);
+  if(data.func == 'processTest') console.log('P')
 }
 
 function makeDemoInteractive () {
