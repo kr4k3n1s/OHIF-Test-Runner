@@ -2,10 +2,9 @@ import { app, BrowserWindow, dialog, globalShortcut, ipcMain, shell} from 'elect
 import { OverlayController, OVERLAY_WINDOW_OPTS } from '..'
 import { Test } from '../models/Test';
 import { TestRunner } from './test-framework';
-const path = require('path');
+import * as CryptoJS from 'crypto-js';
 const fs = require('fs');
 
-// https://github.com/electron/electron/issues/25153
 app.disableHardwareAcceleration()
 let window: BrowserWindow;
 let landingWindow: BrowserWindow;
@@ -14,11 +13,56 @@ var testRunner: TestRunner;
 const toggleMouseKey = 'CmdOrCtrl + J'
 const toggleShowKey = 'CmdOrCtrl + K'
 
-app.on('ready', () => {
-  startLanding();
+app.on('ready', () => { startLanding(); });
+
+ipcMain.on('decrypt-test', (event, data) => {
+  var test = data.data;
+  var password = data.password;
+  var nextOp = data.next;
+
+  try {
+    if(test.encrypted) {
+      var testPlain = CryptoJS.AES.decrypt(test.payload, password).toString(CryptoJS.enc.Utf8);
+      test = JSON.parse(testPlain) as Test;
+    }
+    console.log('File data:', test);
+    landingWindow.webContents.send('decrypted-test', {test: test, next: nextOp});
+  } catch(e) {
+    console.log((e as any).message);
+    landingWindow.webContents.send('bad-password', nextOp);
+    console.log('Wrong pass on edit');
+  }
+})
+
+ipcMain.on('open-test', (event, data) => {
+  dialog.showOpenDialog({
+    properties: ['openFile'],
+    filters: [
+      { name: 'JSON Files', extensions: ['json'] }
+    ]
+  })
+    .then(result => {
+      if (!result.canceled && result.filePaths.length > 0) {
+        // Read the selected JSON file
+        const filePath = result.filePaths[0];
+        const fileData = fs.readFileSync(filePath, 'utf-8');
+        var jsonData = JSON.parse(fileData);
+        // const password = data.password;
+        
+        console.log('File data:', jsonData);
+        landingWindow.webContents.send('edit-test', jsonData);        
+      }
+    })
+    .catch(err => {
+      console.log('Error:', err);
+    });
 })
 
 ipcMain.on('save-file', (event, data) => {
+    saveJSON(data, 'Test');
+});
+
+function saveJSON(data: any, type: 'Test' | 'Result') {
   const options = {
     title: 'Save JSON File',
     buttonLabel: 'Save',
@@ -27,6 +71,15 @@ ipcMain.on('save-file', (event, data) => {
       { name: 'All Files', extensions: ['*'] }
     ]
   };
+
+  if(type == 'Result') data = {...data, password: testRunner.test.password, correctAnswers: testRunner.evaluateCorrectAnswers(testRunner.userAnswers), passed: testRunner.evaluateCorrectAnswers(testRunner.userAnswers) >= testRunner.test.passing}
+  console.log('Saving data: ' + JSON.stringify(data));
+
+  var strData = JSON.stringify(data, null, 2);
+  if(data.password != undefined && data.password != '') {
+    var encrypted = CryptoJS.AES.encrypt(strData, data.password);
+    data = (type == 'Test') ? { encrypted: true, type: type, name: data.name, description: data.description, payload: encrypted.toString() } :  { encrypted: true, type: type, passed: data.passed, payload: encrypted.toString() };
+  }
 
   dialog.showSaveDialog(options).then(result => {
     if (!result.canceled) {
@@ -43,7 +96,7 @@ ipcMain.on('save-file', (event, data) => {
   }).catch(err => {
     console.log(err);
   });
-});
+}
 
 function startLanding() {
   landingWindow = new BrowserWindow({
@@ -87,7 +140,9 @@ function startTest(test: Test) {
 function onTestCompletion(data: any) {
   console.log('Test finished with data: ' + JSON.stringify(data));
   testRunner.window.hide();
-  landingWindow.webContents.send('app-command', {func: 'showResult'});
+  var correctAns = testRunner.evaluateCorrectAnswers(data);
+  console.log('Correct answers: ' + correctAns);
+  landingWindow.webContents.send('app-command', {func: 'showResult', passing: testRunner.test.passing <= correctAns, answers: testRunner.evaluateCorrectAnswers(data)});
   window.webContents.send('app-command', {func: 'hidePermanently'});
   toggleOverlayState(false);
   landingWindow.show();
@@ -119,7 +174,25 @@ function toggleOverlayState (isInteractable: boolean) {
 
 function appCommandRouter(event: Electron.IpcMainEvent, data: any) {
   console.log('Data received: ' + JSON.stringify(data));
-  if(data.func == 'startTest') startTest(data.data as Test);
+  if(data.func == 'startTest') {
+
+    try {
+      var testData = data.data;
+      var testPass = data.password;
+      if(testData.encrypted) {
+        var testPlain = CryptoJS.AES.decrypt(testData.payload, testPass).toString(CryptoJS.enc.Utf8);
+        testData = JSON.parse(testPlain) as Test;
+      }
+      landingWindow.webContents.send('exec-test', true);
+      startTest(testData as Test);
+    } catch (ex) {
+      console.log((ex as any).message);
+      landingWindow.webContents.send('bad-password', 'Wrong password');
+      console.log('Wrong pass');
+    }
+  }
+  if(data.func == 'saveResult') saveJSON(data.data, 'Result');
+  if(data.func == 'sendResult') 
   if(data.func == 'processTest') console.log('P')
 }
 

@@ -2,7 +2,7 @@ export interface Question {
     id: string;
     question: string;
     answers: string[];
-    correctAnswers: number[];
+    correctAnswers: string[];
     url: string;
 }
   

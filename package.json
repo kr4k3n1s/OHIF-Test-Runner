@@ -40,6 +40,8 @@
     "typescript": "5.x.x"
   },
   "dependencies": {
+    "@types/crypto-js": "^4.2.2",
+    "crypto-js": "^4.2.0",
     "node-gyp-build": "4.x.x",
     "open": "^10.1.0",
     "throttle-debounce": "5.x.x"

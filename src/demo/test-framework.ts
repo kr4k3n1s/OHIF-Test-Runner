@@ -2,10 +2,6 @@ import { BrowserWindow, shell } from "electron";
 import { TestWindow } from "../html/TestWindow";
 import { Question } from "../models/Question";
 import { Test } from "../models/Test";
-import * as test1 from '../tests/test1.json';
-import { ResultWindow } from "../html/ResultWindow";
-
-
 
 export class TestRunner {
   window: BrowserWindow
@@ -46,6 +42,21 @@ export class TestRunner {
     if(data.func == 'prevQuestion') this.showQuestion((this.questionIndex > 0) ? --this.questionIndex : 0);
     if(data.func == 'showQuestion') this.showQuestion(data.index);
     if(data.func == 'finishTest') this.onCompletion(this.userAnswers);
+  }
+
+  evaluateCorrectAnswers(answers: {questionID: string, answers: string[]}[]) {
+    var correct = 0;
+    for(var answer of answers) {
+      console.log('Checking: ' + answer.questionID);
+      var qIndex = this.test.questions.findIndex(q => q.id == answer.questionID);
+      console.log('qIndex: ' + qIndex);
+      if(qIndex == -1) continue;
+
+      var matched = answer.answers.filter(ans => this.test.questions[qIndex].correctAnswers.indexOf(ans) > -1);
+      console.log('Matched: ' + matched);
+      if(matched.length == this.test.questions[qIndex].correctAnswers.length && answer.answers.length == this.test.questions[qIndex].correctAnswers.length) correct += 1;
+    }
+    return correct;
   }
 
 }
