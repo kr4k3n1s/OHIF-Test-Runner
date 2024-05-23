@@ -1,33 +1,202 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Title of the document</title>
+        <title>OHIF Test Framework</title>
+        <link rel="stylesheet" href="../css/landing.css">
         <style>
             body {background-color: #efeff7;}
             a    { text-decoration: none; color: #757373; font-size: 15px;font-family: Arial, Helvetica, sans-serif;}
             .text { font-size: 15px; font-family: Arial, Helvetica, sans-serif; }
+            .button { font-size: 15px; font-family: Arial, Helvetica, sans-serif; background-color: #4265ff; font-size: 16px; color: white; border-radius: 99px; padding: 12px; padding-left: 25px; padding-right: 25px; border: none; width: fit-content; margin-top: 15px; transition: 0.5s;}
+            .button:disabled { background-color: #9b9b9b; }
+            .button:disabled:hover { background-color: #9b9b9b; }
+            .button:hover {background-color: #778deb; transition: 0.5s;}
+            hr.rounded {
+                border: 0;
+                clear:both;
+                display:block;
+                width: 96%;               
+                background-color:#bbbb;
+                height: 1px;
+                margin: 20px;
+            }
+            #drop_zone {
+                background-color: #dadae2;
+                border-radius: 20px;
+                padding: 20px;
+                padding-left: 40px;
+                padding-right: 40px;
+                width: fit-content;
+                color: #bebebe;
+            }
+            .vl {
+                border-left: 2px solid rgb(222, 222, 222);
+                height: 80vh;
+                border-radius: 20px;
+                margin-top: 150px;
+            }
+            
         </style>
     </head>
 
     <body>
-        <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin: 20px; margin-right: 30px;">
-            <div>
-                <img src="../img/OHIF_TEST_FRAMEWORK.png" style="width: 300px;"/>
-            </div>
-            <div style="display: flex; flex-direction: row; gap: 40px; justify-content: flex-end; align-items: center;">
-                <a href="#">About</a>
-                <a href="#">How it works</a>
-                <a href="#">Authors</a>
-            </div>
-        </div>
-        <div>
-            <div style="display: flex; flex-direction: column; gap: 10px; width: 35%; z-index: 5; margin-left: 5.5%; margin-top: 7%">
-                <span class="text" style="font-size: 37px; font-weight: 800; color: #4265ff; line-height: 48px;">Ignite Your Medical Imaging Education Journey</span>
-                <span class="text" style="font-size: 15px; font-weight: 100; width: 80%; color: #595858; line-height: 20px;">Welcome to a transformative learning experience that will ignite your passion for medical imaging. Our comprehensive framework is designed to empower aspiring radiologists, medical professionals, and students to embark on an exciting educational journey.</span>
+        <!-- Landing page View -->
+        <div id="landingPage">
+            <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin: 20px; margin-right: 30px;">
+                <div>
+                    <img src="../img/OHIF_TEST_FRAMEWORK.png" style="width: 300px;"/>
+                </div>
+                <div style="display: flex; flex-direction: row; gap: 40px; justify-content: flex-end; align-items: center;">
+                    <a href="#">About</a>
+                    <a href="#">How it works</a>
+                    <a href="#">Authors</a>
+                </div>
             </div>
             <div>
-                <img src="../img/landing_thumb.png" style="width: 60%; position: fixed; right: 90px; bottom: 40px; z-index: -1;"/>
+                <div style="display: flex; flex-direction: column; gap: 10px; width: 45%; z-index: 5; margin-left: 5.5%; margin-top: 6%">
+                    <span class="text" style="font-size: 37px; font-weight: 800; color: #4265ff; line-height: 48px;">Ignite Your Medical Imaging Education Journey</span>
+                    <span class="text" style="font-size: 15px; font-weight: 100; width: 80%; color: #595858; line-height: 20px; margin-top: 5px;">Welcome to a transformative learning experience that will ignite your passion for medical imaging. Our comprehensive framework is designed to empower aspiring radiologists, medical professionals, and students to embark on an exciting educational journey.</span>
+                    <button class="button" onclick="showActions()">Start now!</button>
+                </div>
+                <div>
+                    <img src="../img/landing_thumb.png" style="width: 55%; position: fixed; right: 90px; bottom: 40px; z-index: -1;"/>
+                </div>
             </div>
         </div>
+        <!-- Test Actions View -->
+        <div id="actions" style="display: none;" class="MainContainer">
+            <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin: 20px; margin-right: 30px;">
+                <div style="display: flex; flex-direction: row; align-items: center; gap: 8px;">
+                    <a href="#" class="text" style="color:#595858; font-size: 17px;" onclick="showLanding()">⬅</a>
+                    <a href="#" lass="text" style="color:#595858; margin-bottom: 1px; font-size: 17px;" onclick="showLanding()">Back</a>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; justify-content: space-evenly; height: 100%;">
+                <div style="display: flex; flex-direction: column; gap: 10px; margin: 20px;">
+                    <span class="text" style="font-weight: 800; color: #4265ff; font-size: 30px;">Start your test here!</span>
+                    <span class="text" style="font-size: 14px; font-weight: 100; width: 80%; color: #595858; line-height: 20px; margin-top: 5px;">To start your test, you need URL or testing file provided by your testing authority. By uploading the test file and clicking on start test, browser with DICOM image reader will be opened along with testing interface. Please, provide testing file bellow.</span>
+                    <div style="display: flex; flex-direction: row; gap: 25px; align-items: center; margin-top: 10px;">
+                        <div
+                            id="drop_zone"
+                            ondrop="dropHandler(event);"
+                            ondragover="dragOverHandler(event);">
+                            <p id="fileName" class="text font-size: 14px;" style="color: #898787">Drag the test file here, or  <a href="#" style="color: #4265ff;">click here...</a></p>
+                        </div>
+                        <p class="text" style="text-align: center; height: fit-content; line-height: 10px; color: #595858;">then</p>
+                        <button id="myBtn" class="button" style="height: fit-content; margin-top: 0px;" onclick="openStartTestModal()" disabled>Start Test</button>
+                    </div>
+                </div>
+                <hr class="rounded">
+                <div style="display: flex; flex-direction: column; gap: 10px; margin: 20px;">
+                    <span class="text" style="font-weight: 800; color: #4265ff; font-size: 30px;">Looking to create new test?</span>
+                    <span class="text" style="font-size: 14px; font-weight: 100; width: 80%; color: #595858; line-height: 20px; margin-top: 5px;">If you are willing to create a new test out of the DICOM images, you are in the right place! This tool will generate you test file that can be then provided to anyone that needs to be tested! To create test you will need loaded dataset in OHIF, questions and answers!</span>
+                    <input type="text" onchange="nameProvided()" id="newTestName" name="newTestName" placeholder="Test name" style="border: none; background-color: #dadae2; border-radius: 13px; padding: 18px; margin-top: 10px; width: 30%;">
+                    <div style="display: flex; flex-direction: row; gap: 10px;">
+                        <button id="newTestBtn" class="button" style="height: fit-content; margin-top: 0px; margin-top: 10px;" onclick="createTest()" disabled>Create Test</button>
+                        <button id="newTestBtn" class="button" style="height: fit-content; margin-top: 0px; margin-top: 10px;" onclick="loadTest()">Load Test</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Start Test Modal -->
+        <div id="myModal" class="Modal is-hidden is-visuallyHidden">
+            <!-- Modal content -->
+            <div id="modalContentBegin" class="Modal-content">
+                <span id="closeModal" class="Close" onclick="closeStartTestModal()">&times;</span>
+                <div style="display: flex; flex-direction: column; gap: 10px; margin: 20px; width: 100%;">
+                    <span id="testName" class="text" style="font-weight: 800; color: #4265ff; font-size: 35px; margin-right: 50px;">Hey there! You are about to start the test!</span>
+                    <span id="testDesc" class="text" style="font-size: 14px; font-weight: 100; width: 80%; color: #595858; line-height: 20px; margin-top: 5px;">Please thoroughly read instructions and details of this test bellow.</span>
+                    <div style="display: flex; flex-direction: column; margin-top: 10px;">
+                        <input type="text" id="testSubj" onchange="updateSubject()" name="testSubj" placeholder="Your identification id" style="border: none; background-color: #dadae2; border-radius: 13px; padding: 18px; margin-top: 10px; width: 50%;">
+                        <span class="text" style="font-size: 14px; font-weight: 100; width: 80%; color: #848484; line-height: 20px; margin-top: 6px; margin-left: 3px;">This information uniquely identifies user taking the test, this detail needs to be provided by your test Proctorer. (Name, ID, email...)</span>
+                        <input type="password" id="testp" name="testp" placeholder="Test password" style="border: none; background-color: #dadae2; border-radius: 13px; padding: 18px; margin-top: 10px; width: 50%; margin-top: 20px;">
+                        <span class="text" style="font-size: 14px; font-weight: 100; width: 80%; color: #848484; line-height: 20px; margin-top: 6px; margin-left: 3px;">Password prevents user to access the test in advace, this will need to be provided by the test author.</span>
+                        <button class="button" style="height: fit-content; margin-top: 0px; margin-top: 25px;" onclick="startTest()">Begin test</button>
+                    </div>
+                </div>
+            </div>
+            <div id="modalContentEdit" class="Modal-content" style="display: none;">
+                <span id="closeModal" class="Close" onclick="closeStartTestModal()">&times;</span>
+                <div style="display: flex; flex-direction: column; gap: 10px; margin: 20px; width: 100%;">
+                    <span id="testEditName" class="text" style="font-weight: 800; color: #4265ff; font-size: 35px; margin-right: 50px;">This test is protected by password!</span>
+                    <span id="testEditDesc" class="text" style="font-size: 14px; font-weight: 100; width: 80%; color: #595858; line-height: 20px; margin-top: 5px;">To continue editing this test, please provide password entered on it's creation to the field bellow.</span>
+                    <div style="display: flex; flex-direction: column;">
+                        <input type="password" id="testEditPass" name="testEditPass" placeholder="Test password" style="border: none; background-color: #dadae2; border-radius: 13px; padding: 18px; margin-top: 5px; width: 50%;">
+                        <span class="text" style="font-size: 14px; font-weight: 100; width: 80%; color: #848484; line-height: 20px; margin-top: 8px; margin-left: 4px;">Password prevents user to access the test in advace, this will need to be provided by the test author.</span>
+                        <div style="display: flex; flex-direction: row; gap: 15px; align-items: center; margin-top: 25px;">
+                            <button class="button" style="height: fit-content; margin-top: 0px;" onclick="decryptFor('testEditPass', 'editTest')">Edit test</button>
+                            <p id="editTestDecryptMessage" class="text" style="color: red;"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="modalContentWaiting" class="Modal-content" style="display: none;">
+                <!-- <span id="closeModal" class="Close">&times;</span> -->
+                <div style="display: flex; flex-direction: column; gap: 10px; margin: 20px; width: 100%;">
+                    <span id="testName" class="text" style="font-weight: 800; color: #4265ff; font-size: 35px; margin-right: 50px;">Waiting for the test completion...</span>
+                    <span class="text" style="font-size: 14px; font-weight: 100; width: 80%; color: #848484; line-height: 20px; margin-top: 6px; margin-left: 3px;">Please return to your browser window to finish the test, if you have any issues with testing interface please contact administrator.</span>
+                </div>
+            </div>
+            <div id="modalContentResult" class="Modal-content" style="display: none;">
+                <!-- <span id="closeModal" class="Close">&times;</span> -->
+                <div style="display: flex; flex-direction: column; gap: 10px; margin: 20px; width: 100%;">
+                    <span id="resultTitle" class="text" style="font-weight: 800; color: #4265ff; font-size: 35px; margin-right: 50px;">Yeey, you have finished the test!</span>
+                    <span id="resultText" class="text" style="font-size: 14px; font-weight: 100; width: 80%; color: #848484; line-height: 20px; margin-top: 6px; margin-left: 3px;">Please return to your browser window to finish the test, if you have any issues with testing interface please contact administrator.</span>
+                    <div style="display: flex; flex-direction: row; gap: 10px; margin-top: 20px;">
+                        <button id="createTestBtn" class="button" style="height: fit-content; margin-top: 0px;" onclick="saveResult('saveResult')">Save Result</button>
+                        <button id="createTestBtn" class="button" style="height: fit-content; margin-top: 0px;" onclick="saveResult('sendResult')">Send via Email</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Test Factory View -->
+        <div id="testFactory" style="display: none; flex-direction: column;" class="MainContainer">
+            <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin: 20px; margin-right: 30px; margin-bottom: 10px;">
+                <div style="display: flex; flex-direction: row; align-items: center; gap: 8px;">
+                    <a href="#" class="text" style="color:#595858; font-size: 17px;" onclick="goToActions() ">⬅</a>
+                    <a href="#" lass="text" style="color:#595858; margin-bottom: 1px; font-size: 17px;" onclick="goToActions() ">Back</a>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: row; justify-content: space-evenly; height: 100%;">
+                <div style="display: flex; flex-direction: column; gap: 10px; margin: 20px; width: 27%; overflow: hidden;">
+                    <span id="testTitle" class="text" style="font-weight: 800; color: #4265ff; font-size: 30px;">Start your test here!</span>
+                    <textarea id="tDesc" name="tDesc" onBlur="updateTest()" placeholder="Here write test description and short instructions" style="border: none; background-color: #dadae2; border-radius: 13px; padding: 18px; margin-top: 10px; width:auto; max-width: 100%; margin-right: 10px; resize: block;"></textarea>
+                    <span  class="text" style="font-size: 14px; font-weight: 100; color: #595858; line-height: 20px; margin-top: 10px; margin-left: 5px;">This test will be exported in the JSON format. If no password provided, then it will not be encrypted and anyone can open this file and read correct options.</span>
+                    <input type="text" onblur="updateTest()" id="qPass" name="qPass" placeholder="Test password" style="border: none; background-color: #dadae2; border-radius: 13px; padding: 18px; width: 88%">
+                    <span class="text" style="font-size: 14px; font-weight: 100; color: #595858; line-height: 20px; margin-top: 10px; margin-left: 5px;">The bellow field defines, how many of the questions needs to be answered correctly by the tested subject to pass this test. Select 0, if you don't want to show the result after test.</span>
+                    <input type="number" id="qPassing" name="qPassing" onblur="updateTest()" placeholder="Number of questions to pass" style="border: none; background-color: #dadae2; border-radius: 13px; padding: 18px; width: 88%">
+                    <div id="testNav" style="display: flex; flex-direction: row; flex-wrap: wrap; gap: 5px;"></div>
+                    <div style="display: flex; flex-direction: row; gap: 25px; align-items: center; margin-top: 10px;">
+                        <button id="createTestBtn" class="button" style="height: fit-content; margin-top: 0px;" onclick="selectDirectory()">Create Test</button>
+                    </div>
+                </div>
+                <div class="vl" style="margin-top: 50px;"></div>
+                <div style="display: flex; flex-direction: column; gap: 10px; margin: 20px; flex: 1; margin-left: 30px;">
+                    <input multiple id="qName" class="text" placeholder="Write question name here..." onBlur="updateQuestion()" style="font-weight: 800; color: #4265ff; font-size: 30px; background-color: #efeff7; border: none;">
+                    <span class="text" style="font-size: 14px; font-weight: 100; color: #595858; line-height: 20px; margin-top: 10px;  margin-left: 5px;">To create a question we will need couple of information, question name, question options and url to the DICOM image that will be opened in the browser window through the OHIF image reader interface.</span>
+                    <input type="text" id="qURL" name="qURL" placeholder="OHIF Image URL" onBlur="updateQuestion()" style="border: none; background-color: #dadae2; border-radius: 13px; padding: 18px; width: 60%;">
+                    <span class="text" style="font-size: 14px; font-weight: 100; color: #595858; line-height: 20px; margin-top: 10px;  margin-left: 5px;">Start creating answers by writing answer into field bellow and clicking "Add Option". To set a asnwers as correct option, please select this question by checking a checkbox of the quesion.</span>
+                    <div style="display: flex; flex-direction: row; align-items: center; gap: 15px;">
+                        <input type="text" id="qAnswer" name="qAnswer" placeholder="Question answer" style="border: none; background-color: #dadae2; border-radius: 13px; padding: 18px; width: 45%;">
+                        <button class="button" style="height: fit-content; margin-top: 0px;" onclick="addOption()">Add Option</button>
+                    </div>
+                    <div id="qOptions" style="display: flex; flex-direction: column; margin-top: 10px; gap: 5px; margin-left: 5px;"></div>
+                    <button class="button" style="height: fit-content; margin-top: 0px; margin-top: 10px;" onclick="newQuestion()">New Question</button>
+                </div>
+            </div>
+        </div>
+        <!-- Test Factory Save As Modal -->
+        <div id="testFactoryModal" class="Modal is-hidden is-visuallyHidden">
+            <!-- Modal content -->
+            <div id="modalContentBegin" class="Modal-content" style="width: 40%;">
+                <span id="closeModal" class="Close" onclick="closeSaveAsModal()">&times;</span>
+                <div style="display: flex; flex-direction: column; gap: 10px; margin: 20px; width: 100%;">
+                    <span class="text" style="font-weight: 800; color: #4265ff; font-size: 35px; margin-right: 50px;">Oh, some error occured during test creation!</span>
+                    <span id="testError" class="text" style="font-size: 14px; font-weight: 100; width: 80%; color: #595858; line-height: 20px; margin-top: 5px;">Please thoroughly read instructions and details of this test bellow.</span>
+                </div>
+            </div>
+        </div>
+        <script src="../scripts/TestFactory.js"></script>
+        <script src="../scripts/AppHandler.js"></script>
     </body>
 </html>

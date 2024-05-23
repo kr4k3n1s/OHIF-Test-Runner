@@ -17,8 +17,8 @@
     "watch",
     "foreground"
   ],
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/demo/electron-runner.js",
+  "types": "dist/demo.electron-runner.d.ts",
   "scripts": {
     "install": "node-gyp-build",
     "prebuild": "prebuildify --napi",
@@ -52,5 +52,24 @@
   },
   "peerDependencies": {
     "electron": ">= 18"
+  },
+  "build": {
+    "extraResources": [
+      {
+        "from": "./src/html/",
+        "to": "html",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "appId": "com.tuke.ohif-testrunner",
+    "win": {
+      "target": "portable"
+    },
+    "portable": {
+      "unicode": false,
+      "artifactName": "my_electron_app.exe"
+    }
   }
 }

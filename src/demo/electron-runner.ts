@@ -3,6 +3,7 @@ import { OverlayController, OVERLAY_WINDOW_OPTS } from '..'
 import { Test } from '../models/Test';
 import { TestRunner } from './test-framework';
 import * as CryptoJS from 'crypto-js';
+import path = require('path');
 const fs = require('fs');
 
 app.disableHardwareAcceleration()
@@ -117,8 +118,13 @@ function startLanding() {
 
   ipcMain.on('app-command', appCommandRouter);
 
-  landingWindow.loadFile("../html/landing.html");
-  landingWindow.show();
+  landingWindow.loadFile(path.join(__dirname, "../html/landing.html"));
+
+  // Show window when page is ready
+  landingWindow.once('ready-to-show', () => {
+    landingWindow.show();
+  })
+  // landingWindow.show();
 }
 
 function startTest(test: Test) {
